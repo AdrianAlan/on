@@ -1,4 +1,10 @@
+/*
+ * This service provides information about azimuth, pitch and roll.
+ * This service is running constantly in the background as the response of the application has to be immediate and the process of communicating with the server takes enough time already.
+ */
 package com.off.on.sensors;
+
+import com.off.on.utils.Constants;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,7 +13,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
-import android.widget.Toast;
+import android.util.Log;
 
 public class OrientationService extends Service implements SensorEventListener {
 
@@ -15,14 +21,13 @@ public class OrientationService extends Service implements SensorEventListener {
 	private Sensor sensorAccelerometer, sensorMagneticField;
 	private float[] valuesAccelerometer, valuesMagneticField;
 	private float[] matrixR, matrixI, matrixValues;
-	private String out = "";
+	private double azimuthON = 0, pitchON = 0, rollON = 0;
 
 	@Override
 	public void onCreate() {
-		Toast.makeText(getApplicationContext(), "Created Compass",
-				Toast.LENGTH_LONG).show();
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
+		//we use two types of sensors to ensure accuracy
 		sensorAccelerometer = sensorManager
 				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		sensorMagneticField = sensorManager
@@ -30,7 +35,6 @@ public class OrientationService extends Service implements SensorEventListener {
 
 		valuesAccelerometer = new float[3];
 		valuesMagneticField = new float[3];
-
 		matrixR = new float[9];
 		matrixI = new float[9];
 		matrixValues = new float[3];
@@ -44,16 +48,21 @@ public class OrientationService extends Service implements SensorEventListener {
 	}
 
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		Toast.makeText(getApplicationContext(), "Started Compass" + out,
-				Toast.LENGTH_LONG).show();
-		return super.onStartCommand(intent, flags, startId);
+	public void onStart(Intent intent, int startId) {
+		sendOrientationIntent();
+	}
+
+	private void sendOrientationIntent() {
+		Intent onOrientationIntent = new Intent();
+		onOrientationIntent.setAction(Constants.OrientationActionTag);
+		onOrientationIntent.putExtra(Constants.OrientationFlagAzimuth, getAzimuth());
+		onOrientationIntent.putExtra(Constants.OrientationFlagRoll, getRoll());
+		onOrientationIntent.putExtra(Constants.OrientationFlagPitch, getPitch());
+		sendBroadcast(onOrientationIntent);
 	}
 
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -76,17 +85,38 @@ public class OrientationService extends Service implements SensorEventListener {
 					valuesAccelerometer, valuesMagneticField);
 			if (success) {
 				SensorManager.getOrientation(matrixR, matrixValues);
-
-				double azimuth = Math.toDegrees(matrixValues[0]);
-				double pitch = Math.toDegrees(matrixValues[1]);
-				double roll = Math.toDegrees(matrixValues[2]);
-
-				out = String.format("Azimuth: %.2f\nPitch:%.2f\nRoll:%.2f",
-						azimuth, pitch, roll);
+				setAzimuth(Math.toDegrees(matrixValues[0]));
+				setPitch(Math.toDegrees(matrixValues[1]));
+				setRoll(Math.toDegrees(matrixValues[2]));
 			}
 		} catch (Exception e) {
-
+			Log.e("onOrientationManager", "Failed to request orientation update"
+					+ e);
 		}
+	}
+
+	private double getAzimuth() {
+		return azimuthON;
+	}
+
+	private void setAzimuth(double azimuthON) {
+		this.azimuthON = azimuthON;
+	}
+
+	private double getPitch() {
+		return pitchON;
+	}
+
+	private void setPitch(double pitchON) {
+		this.pitchON = pitchON;
+	}
+
+	private double getRoll() {
+		return rollON;
+	}
+
+	private void setRoll(double rollON) {
+		this.rollON = rollON;
 	}
 
 	@Override

@@ -10,57 +10,56 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import com.off.on.utils.*;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
+
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 public class IndexActivity extends Activity {
 
-	private ToggleButton ONorOFF;
+	private Button ONorOFF;
 	private TextView mainText;
-	private MyReceiver myReceiver;
+	private MyReceiver onStateReceiver;
+
+	private double latitude, longitude, altitude, azimuth, pitch, roll;
+	private float accuracy;
+	private boolean networkProvider, gpsProvider;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_index);
 
-		ONorOFF = (ToggleButton) findViewById(R.id.toggleButtonOnOff);
+		ONorOFF = (Button) findViewById(R.id.buttonRefresh);
 		mainText = (TextView) findViewById(R.id.mainText);
-
-		ONorOFF.setChecked(true);
-		ONorOFF.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
+		
+		ONorOFF.setOnClickListener(new OnClickListener() {
+			
 			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-
-				if (!ONorOFF.isChecked()) {
-					Toast.makeText(getApplicationContext(), "Refreshed",
-							Toast.LENGTH_SHORT).show();
-					startService(new Intent(getApplicationContext(),
-							LocationService.class));
-					startService(new Intent(getApplicationContext(),
-							OrientationService.class));
-				}
+			public void onClick(View v) {
+				Toast.makeText(getApplicationContext(), "Refreshed",
+						Toast.LENGTH_SHORT).show();
+				getCurrentState(true, true);
 			}
 		});
 	}
 
 	@Override
 	protected void onStart() {
-		myReceiver = new MyReceiver();
-		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(Constants.LocationActionTag);
-		registerReceiver(myReceiver, intentFilter);
+
+		onStateReceiver = new MyReceiver();
+		IntentFilter intentLocationFilter = new IntentFilter();
+		intentLocationFilter.addAction(Constants.LocationActionTag);
+		intentLocationFilter.addAction(Constants.OrientationActionTag);
+		registerReceiver(onStateReceiver, intentLocationFilter);
 		super.onStart();
 	}
 
 	@Override
 	protected void onDestroy() {
-		unregisterReceiver(myReceiver);
+		unregisterReceiver(onStateReceiver);
 		super.onStop();
 	}
 
@@ -71,31 +70,57 @@ public class IndexActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		startService(new Intent(getApplicationContext(), LocationService.class));
-		startService(new Intent(getApplicationContext(), OrientationService.class));
+		getCurrentState(true, true);
 		super.onResume();
 	}
 
 	private class MyReceiver extends BroadcastReceiver {
 
 		@Override
-		public void onReceive(Context arg0, Intent arg1) {
-			double lat = arg1
-					.getDoubleExtra(Constants.LocationFlagLatitude, -1);
-			double lon = arg1.getDoubleExtra(Constants.LocationFlagLongitude,
-					-1);
-			double alt = arg1
-					.getDoubleExtra(Constants.LocationFlagAltitude, -1);
-			float acc = arg1.getFloatExtra(Constants.LocationFlagAccuracy, -1);
-			boolean gpsP = arg1.getBooleanExtra(Constants.LocationGPSProvider,
-					false);
-			boolean netP = arg1.getBooleanExtra(
-					Constants.LocationNetworkProvider, false);
-			mainText.setText("Latitude: " + String.valueOf(lat)
-					+ "; Longitude: " + String.valueOf(lon) + "; Altitude: "
-					+ String.valueOf(alt) + "; Accuracy: "
-					+ String.valueOf(acc) + "; GPS: " + gpsP + "; Network: "
-					+ netP);
+		public void onReceive(Context arg0, Intent receiverIntent) {
+			if (receiverIntent.getAction().equals(Constants.LocationActionTag)) {
+				latitude = receiverIntent.getDoubleExtra(
+						Constants.LocationFlagLatitude, 0);
+				longitude = receiverIntent.getDoubleExtra(
+						Constants.LocationFlagLongitude, 0);
+				altitude = receiverIntent.getDoubleExtra(
+						Constants.LocationFlagAltitude, 0);
+				accuracy = receiverIntent.getFloatExtra(
+						Constants.LocationFlagAccuracy, 0);
+				gpsProvider = receiverIntent.getBooleanExtra(
+						Constants.LocationGPSProvider, false);
+				networkProvider = receiverIntent.getBooleanExtra(
+						Constants.LocationNetworkProvider, false);
+			}
+			if (receiverIntent.getAction().equals(
+					Constants.OrientationActionTag)) {
+				azimuth = receiverIntent.getDoubleExtra(
+						Constants.OrientationFlagAzimuth, 0);
+				pitch = receiverIntent.getDoubleExtra(
+						Constants.OrientationFlagPitch, 0);
+				roll = receiverIntent.getDoubleExtra(
+						Constants.OrientationFlagRoll, 0);
+			}
+
+			mainText.setText("Latitude: " + String.valueOf(latitude)
+					+ "; Longitude: " + String.valueOf(longitude)
+					+ "; Altitude: " + String.valueOf(altitude)
+					+ "; Accuracy: " + String.valueOf(accuracy) + "; GPS: "
+					+ gpsProvider + "; Network: " + networkProvider
+					+ "; Azimuth: " + String.valueOf(azimuth) + "; Roll "
+					+ String.valueOf(roll) + "; Pitch: " + pitch);
+		}
+	}
+
+	private void getCurrentState(boolean locationService,
+			boolean orientationService) {
+		if (locationService) {
+			startService(new Intent(getApplicationContext(),
+					LocationService.class));
+		}
+		if (orientationService) {
+			startService(new Intent(getApplicationContext(),
+					OrientationService.class));
 		}
 	}
 }

@@ -9,7 +9,7 @@
         android:id="@+id/mainText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toggleButtonOnOff"
+        android:layout_below="@+id/buttonRefresh"
         android:gravity="left"
         android:keepScreenOn="true"
         android:text="@string/dummy_content"
@@ -17,11 +17,12 @@
         android:textSize="30sp"
         android:textStyle="bold" />
 
-    <ToggleButton
-        android:id="@+id/toggleButtonOnOff"
+    <Button
+        android:id="@+id/buttonRefresh"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentLeft="true"
+        android:text="Refresh" />
 
 </RelativeLayout>
