@@ -1,5 +1,6 @@
 package com.off.on;
 
+import com.off.on.sensors.OrientationService;
 import com.off.on.sensors.LocationService;
 
 import android.app.Activity;
@@ -41,6 +42,8 @@ public class IndexActivity extends Activity {
 							Toast.LENGTH_SHORT).show();
 					startService(new Intent(getApplicationContext(),
 							LocationService.class));
+					startService(new Intent(getApplicationContext(),
+							OrientationService.class));
 				}
 			}
 		});
@@ -69,6 +72,7 @@ public class IndexActivity extends Activity {
 	@Override
 	protected void onResume() {
 		startService(new Intent(getApplicationContext(), LocationService.class));
+		startService(new Intent(getApplicationContext(), OrientationService.class));
 		super.onResume();
 	}
 
@@ -83,9 +87,15 @@ public class IndexActivity extends Activity {
 			double alt = arg1
 					.getDoubleExtra(Constants.LocationFlagAltitude, -1);
 			float acc = arg1.getFloatExtra(Constants.LocationFlagAccuracy, -1);
-			mainText.setText("Latitude: " + String.valueOf(lat) + "; Longitude: "
-					+ String.valueOf(lon) + "; Altitude: " + String.valueOf(alt)
-					+ "; Accuracy: " + String.valueOf(acc));
+			boolean gpsP = arg1.getBooleanExtra(Constants.LocationGPSProvider,
+					false);
+			boolean netP = arg1.getBooleanExtra(
+					Constants.LocationNetworkProvider, false);
+			mainText.setText("Latitude: " + String.valueOf(lat)
+					+ "; Longitude: " + String.valueOf(lon) + "; Altitude: "
+					+ String.valueOf(alt) + "; Accuracy: "
+					+ String.valueOf(acc) + "; GPS: " + gpsP + "; Network: "
+					+ netP);
 		}
 	}
 }

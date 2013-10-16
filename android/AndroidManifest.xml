@@ -27,6 +27,7 @@
         </activity>
 
         <service android:name="com.off.on.sensors.LocationService" />
+        <service android:name="com.off.on.sensors.OrientationService" />
     </application>
 
 </manifest>

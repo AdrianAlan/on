@@ -27,6 +27,7 @@ public class LocationService extends Service {
 
 	// variables initiated as negative to possibly detect no action taken by
 	// this service in other processes.
+	private boolean networkProvider = false, gpsProvider = false;
 	private double latitudeON = -1, longitudeON = -1, altitudeON = -1;
 	private float accuracyON = -1;
 
@@ -40,7 +41,9 @@ public class LocationService extends Service {
 			onLocationManager.requestLocationUpdates(
 					LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL,
 					LOCATION_DISTANCE, onLocationListeners[1]);
+			setNetworkProvider(true);
 		} catch (Exception e) {
+			setNetworkProvider(false);
 			Log.e("onLocationManager",
 					"Failed to request network location update" + e);
 		}
@@ -49,7 +52,9 @@ public class LocationService extends Service {
 			onLocationManager.requestLocationUpdates(
 					LocationManager.GPS_PROVIDER, LOCATION_INTERVAL,
 					LOCATION_DISTANCE, onLocationListeners[0]);
+			setGpsProvider(true);
 		} catch (Exception e) {
+			setGpsProvider(false);
 			Log.e("onLocationManager", "Failed to request gps location update"
 					+ e);
 		}
@@ -86,6 +91,8 @@ public class LocationService extends Service {
 		onGPSIntent.putExtra(Constants.LocationFlagLongitude, getLongitude());
 		onGPSIntent.putExtra(Constants.LocationFlagAltitude, getAltitude());
 		onGPSIntent.putExtra(Constants.LocationFlagAccuracy, getAccuracy());
+		onGPSIntent.putExtra(Constants.LocationGPSProvider, isGpsProvider());
+		onGPSIntent.putExtra(Constants.LocationNetworkProvider, isNetworkProvider());
 		sendBroadcast(onGPSIntent);
 	}
 
@@ -160,5 +167,21 @@ public class LocationService extends Service {
 			onLocationManager = (LocationManager) getApplicationContext()
 					.getSystemService(Context.LOCATION_SERVICE);
 		}
+	}
+
+	public boolean isGpsProvider() {
+		return gpsProvider;
+	}
+
+	public void setGpsProvider(boolean gpsProvider) {
+		this.gpsProvider = gpsProvider;
+	}
+
+	public boolean isNetworkProvider() {
+		return networkProvider;
+	}
+
+	public void setNetworkProvider(boolean networkProvider) {
+		this.networkProvider = networkProvider;
 	}
 }
