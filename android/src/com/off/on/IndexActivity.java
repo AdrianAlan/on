@@ -1,5 +1,6 @@
 package com.off.on;
 
+import com.off.on.communication.WebSpeaker;
 import com.off.on.sensors.OrientationService;
 import com.off.on.sensors.LocationService;
 
@@ -41,8 +42,12 @@ public class IndexActivity extends Activity {
 			public void onClick(View v) {
 				Toast.makeText(getApplicationContext(), "Refreshed",
 						Toast.LENGTH_SHORT).show();
+				
 				getCurrentState(true, true);
-			}
+				
+				String url = "http://54.225.24.113/cs4274/test.php";
+				new WebSpeaker(getApplicationContext()).execute(url);
+			    }
 		});
 	}
 
