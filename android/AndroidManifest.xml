@@ -46,6 +46,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.off.on.map.MapActivity">
+        </activity>
+        
         <service android:name="com.off.on.sensors.LocationService" />
         <service android:name="com.off.on.sensors.OrientationService" />
 		
