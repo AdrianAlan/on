@@ -1,7 +1,7 @@
 package com.off.on;
 
 import com.off.on.communication.WebSpeaker;
-import com.off.on.map.MapActivity;
+import com.off.on.fragments.OnMapFragment;
 import com.off.on.sensors.OrientationService;
 import com.off.on.sensors.LocationService;
 
@@ -131,7 +131,7 @@ public class IndexActivity extends Activity {
 	}
 	
 	public void testMap(View view) {
-		Intent intent = new Intent(this, MapActivity.class);
+		Intent intent = new Intent(this, TabActivity.class);
 	    startActivity(intent);
 	}
 }
