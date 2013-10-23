@@ -1,0 +1,202 @@
+#! /usr/bin/perl
+
+use strict;
+
+use CGI;
+use CGI::Carp qw(fatalsToBrowser);
+use Data::Dumper;
+use JSON;
+use DBI;
+use Math::Trig qw(asin deg2rad rad2deg);
+use Math::Complex;
+
+my $q = CGI->new();
+
+print $q->header();
+
+my $offset = 30;
+my $d = 100;
+my $R = 6731000; # earth radius in meters
+
+my $lat = toDecimal($q->param('latitude'));
+my $lon = toDecimal($q->param('longitude'));
+my $theta = $q->param('azimuth');
+my $accuracy = $q->param('accuracy');
+
+print "input: $lat - $lon - $theta <br>";
+
+# Find the 0 point 
+my $theta0 = $theta + 180;
+my $lat0 = calLatitude ($lat, $lon, $theta0, $accuracy, $R);
+my $lon0 = calLongtitude ($lat, $lon, $theta0, $accuracy, $R);
+
+print "0 point: $lat0 - $lon0 - $theta0 <br>";
+
+#print calDistance("50.847222", "50.847222", "50.8475", "50.847222 <br>");
+# Create the 2 point that can create the border */
+my $theta1 = $theta - $offset;
+my $lat1 = calLatitude ($lat0, $lon0, $theta1, $d, $R);
+my $lon1 = calLongtitude ($lat0, $lon0, $theta1, $d, $R);
+
+print "First point: $lat1 - $lon1 - $theta1 <br>";
+
+my $theta2 = $theta + $offset;
+my $lat2 = calLatitude ($lat0, $lon0, $theta2, $d, $R);
+my $lon2 = calLongtitude ($lat0, $lon0, $theta2, $d, $R);
+
+print "Second point: $lat2 - $lon2 - $theta2 <br>";
+
+
+# Query the database for coordinate in range
+my ($maxLat, $minLat, $maxLon, $minLon) = findBorderValue({
+		'lat' => [ $lat0, $lat1, $lat2 ],
+		'lon' => [ $lon0, $lon1, $lon2 ]
+	});
+
+print "Border value: $minLat - $maxLat - $minLon - $maxLon <br>";
+
+# Convert point 1 and 2 to x, y coordinates, distance is d
+my ($x1, $y1) = convertCoordinate({
+		'distance' => $d,
+		'angle' => $theta1
+	});
+
+my ($x2, $y2) = convertCoordinate({
+		'distance' => $d,
+		'angle' => $theta2
+	});
+
+print "Triangle point: $x1 - $y1, $x2 - $y2 <br>";
+
+my $db = DBI->connect('dbi:mysql:cs4274','root','cs2107') or die "cant connect to db";
+my $sql = "select * from places where longitude between ? and ? and latitude between ? and ?";
+my $sth = $db->prepare($sql);
+$sth->execute($minLon, $maxLon, $minLat, $maxLat);
+
+
+# Determine if the retrieve value is inside the view area
+my $result;
+while (my $row = $sth->fetchrow_hashref) {
+	my $lat3 = $row->{'latitude'};
+	my $lon3 = $row->{'longitude'};
+	my $d3 = calDistance($lat0, $lon0, $lat3, $lon3);
+	my $bearing = calBearing($lat0, $lon0, $lat3, $lon3);
+	my ($x3, $y3) = convertCoordinate({
+			'distance' => $d3,
+			'angle' => $bearing
+		});	
+	if (isInsideTri($x1, $y1, $x2, $y2, $x3, $y3)){
+		$result->{$row->{'id'}} = $row;
+	}
+}
+print Dumper $result;
+
+sub calLatitude {
+	my ($lat1, $lon1, $theta, $d, $R) = @_;
+	my $lat2 = asin( sin(deg2rad($lat1))*cos($d/$R) + cos(deg2rad($lat1))*sin($d/$R)*cos(deg2rad($theta)) ); # in radian
+	return rad2deg($lat2);	# convert back to degree
+}
+
+sub calLongtitude {
+	my ($lat1, $lon1, $theta, $d, $R) = @_;
+	my $lon2 = deg2rad($lon1) + atan2(sin(deg2rad($theta))*sin($d/$R)*cos(deg2rad($lat1)), 
+		cos($d/$R)-sin(deg2rad($lat1))*sin(deg2rad($lat1)));
+	return rad2deg($lon2);
+}
+
+sub calDistance {
+	my ($lat1, $lon1, $lat2, $lon2) = @_;
+	my $dLat = deg2rad(($lat2-$lat1));
+	my $dLon = deg2rad(($lon2-$lon1));
+	my $lat1 = deg2rad($lat1);
+	my $lat2 = deg2rad($lat2);
+
+	my $a = sin($dLat/2) * sin($dLat/2) +
+        sin($dLon/2) * sin($dLon/2) * cos($lat1) * cos($lat2); 
+	my $c = 2 * atan2(sqrt($a), sqrt(1-$a)); 
+	my $d = $R * $c;
+
+	return $d;
+}
+
+sub calBearing {
+	my ($lat1, $lon1, $lat2, $lon2) = @_;
+	my $dLat = deg2rad(($lat2-$lat1));
+	my $dLon = deg2rad(($lon2-$lon1));
+	my $lat1 = deg2rad($lat1);
+	my $lat2 = deg2rad($lat2);
+
+	my $y = sin($dLon) * cos($lat2);
+	my $x = cos($lat1)*sin($lat2) - sin($lat1)*cos($lat2)*cos($dLon);
+	my $bearing = rad2deg(atan2($y, $x));
+
+	return $bearing;
+}
+
+sub toDecimal {
+	my ($coordinate) = @_;
+	if ($coordinate =~ /[SW]/) {
+		$coordinate =~ s/[SW]//g;
+		return -$coordinate;
+	} else {
+		$coordinate =~ s/[NE]//g;
+		return $coordinate;
+	}
+}
+
+sub findBorderValue {
+	my $parameters = shift;
+
+	my $lat = $parameters->{'lat'};
+	my $lon = $parameters->{'lon'};
+	my ($maxLat, $minLat, $maxLon, $minLon) = ($lat->[0], $lat->[0], $lon->[0], $lon->[0]);
+
+	foreach my $value (@$lat) {
+		if ($value > $maxLat) {
+			$maxLat = $value;
+		}
+
+		if ($value < $minLat) {
+			$minLat = $value;
+		}
+	}
+
+	foreach my $value (@$lon) {
+		if ($value > $maxLon) {
+			$maxLon = $value;
+		}
+
+		if ($value < $minLon) {
+			$minLon = $value;
+		}
+	}	
+
+	return ($maxLat, $minLat, $maxLon, $minLon);
+}
+
+sub convertCoordinate {
+	my $parameters = shift;
+
+	my $distance = $parameters->{'distance'};
+	my $angle = $parameters->{'angle'};
+
+	my $x = $distance*sin(deg2rad($angle));
+	my $y = $distance*cos(deg2rad($angle));
+
+	return ($x, $y);	
+}
+
+# Check if point 3 is inside the triangle made of point 0, 1, 2
+# point 0 coordinates is (0,0)
+# Refer to andreasdr answer at http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-triangle
+sub isInsideTri {
+	my ($x1, $y1, $x2, $y2, $x3, $y3) = @_;	
+	my ($x0, $y0) = (0,0);
+
+	my $area = 1/2 * (-$y1*$x2 + $y0*(-$x1 + $x2) + $x0*($y1 - $y2) + $x1*$y2);
+	my $s = 1/(2*$area) * ($y0*$x2 - $x0*$y2 + ($y2 - $y0)*$x3 + ($x0 - $x2)*$y3);
+	my $t = 1/(2*$area) * ($x0*$y1 - $y0*$x1 + ($y0 - $y1)*$x3 + ($x1 - $x0)*$y3);
+
+	return 1 if ($s > 0 and $t > 0 and (1-$s-$t) > 0);
+	return 0;
+}
