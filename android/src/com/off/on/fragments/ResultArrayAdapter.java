@@ -33,7 +33,7 @@ public class ResultArrayAdapter<T> extends ArrayAdapter<T> {
             TextView lineTwoView = (TextView)listItemView.findViewById(
                 R.id.textViewSub);
 
-            T t = (T)getItem(position); 
+            //T t = (T)getItem(position); 
             lineOneView.setText("Testing Text - The Title of the item");
             lineTwoView.setText("Testing Text - Added with information, might fill up several lines.");
 

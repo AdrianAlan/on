@@ -1,23 +1,21 @@
 package com.off.on;
 
-import com.off.on.communication.WebSpeaker;
-import com.off.on.fragments.OnMapFragment;
-import com.off.on.sensors.OrientationService;
-import com.off.on.sensors.LocationService;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import com.off.on.utils.*;
-
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.off.on.communication.WebSpeaker;
+import com.off.on.sensors.LocationService;
+import com.off.on.sensors.OrientationService;
+import com.off.on.utils.Constants;
 
 public class IndexActivity extends Activity {
 

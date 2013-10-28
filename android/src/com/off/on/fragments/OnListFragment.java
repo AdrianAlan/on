@@ -11,6 +11,7 @@ import android.widget.ListView;
 
 public class OnListFragment extends ListFragment {
 
+	private static String[] test = {"test1", "test2", "test3"};
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);

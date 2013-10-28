@@ -21,7 +21,12 @@ public class OnMapFragment extends MapFragment {
 
 	private GoogleMap map;
 	private static View view;
+	
+	// Testing purposes
 	private final static LatLng SOC = new LatLng(1.295441, 103.773497);
+	private final static LatLng SOCFrontLeft = new LatLng(1.295441 - 0.00025, 103.773497 + 0.0005);
+	private final static LatLng SOCFrontRight = new LatLng(1.295441 + 0.00025, 103.773497 + 0.0005);
+
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,17 +45,16 @@ public class OnMapFragment extends MapFragment {
 	}
 
 	private void addMarkers() {
-		// Add info marker - it is possible to draw a canvas on info markers
 		map.addMarker(new MarkerOptions()
-		.position(new LatLng(SOC.latitude, SOC.longitude + 0.0005))
+		.position(new LatLng(SOC.latitude, SOC.longitude + 0.00025))
 		.title("School of Computing")
-		.snippet("Snippet about the location"));
+		.snippet("Snippet about the location."));
 	}
 
 	private void drawPolygon() {
 		// Add triangular polygon
 		map.addPolygon(new PolygonOptions()
-		.addAll(createTriangle(SOC, 0.0005, 0.0005))
+		.addAll(createTriangle(SOC, SOCFrontLeft, SOCFrontRight))
 		.fillColor(Color.argb(64, 255, 0, 0))
 		.strokeColor(Color.BLACK)
 		.strokeWidth(1));	
@@ -67,10 +71,7 @@ public class OnMapFragment extends MapFragment {
 	}
 
 
-	private List<LatLng> createTriangle(LatLng center, double halfWidth, double halfHeight) {
-		return Arrays.asList(
-				new LatLng(center.latitude, center.longitude),
-				new LatLng(center.latitude - halfHeight/2, center.longitude + 2*halfWidth),
-				new LatLng(center.latitude + halfHeight/2, center.longitude + 2*halfWidth));
+	private List<LatLng> createTriangle(LatLng viewpoint, LatLng frontLeft, LatLng frontRight) {
+		return Arrays.asList(viewpoint, frontLeft, frontRight);
 	}
 }
