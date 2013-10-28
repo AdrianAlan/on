@@ -2,16 +2,16 @@ package com.off.on;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.view.Window;
 
 import com.off.on.fragments.OnListFragment;
 import com.off.on.fragments.OnMapFragment;
 
-public class TabActivity extends FragmentActivity {
+public class TabActivity extends Activity {
 
 	private static final String TAG_MAP = "map";
 	private static final String TAG_LIST = "list";
@@ -60,31 +60,31 @@ public class TabActivity extends FragmentActivity {
 	public static class TabListener<T extends Fragment> implements ActionBar.TabListener {
 
 		private Fragment frag;
-		private final FragmentActivity act;
+		private final Activity act;
 		private final String tag;
 		private final Class<T> fragClass;
 		private FragmentTransaction fragTrans;
 
-		public TabListener(FragmentActivity activity, String tag, Class<T> clz) {
+		public TabListener(Activity activity, String tag, Class<T> clz) {
 
 			this.act = activity;
 			this.tag = tag;
 			this.fragClass = clz;
 
-			frag = act.getSupportFragmentManager().findFragmentByTag(tag);
+			frag = act.getFragmentManager().findFragmentByTag(tag);
 			
 			if (frag != null && !frag.isDetached()) {
-				act.getSupportFragmentManager().beginTransaction()
+				act.getFragmentManager().beginTransaction()
 				.detach(frag)
 				.commit();
 			}
 		}
 
 		@Override
-		public void onTabSelected(Tab tab, android.app.FragmentTransaction ft) {
+		public void onTabSelected(Tab tab, FragmentTransaction ft) {
 
-			frag = act.getSupportFragmentManager().findFragmentByTag(tag);
-			fragTrans = act.getSupportFragmentManager().beginTransaction();
+			frag = act.getFragmentManager().findFragmentByTag(tag);
+			fragTrans = act.getFragmentManager().beginTransaction();
 
 			if (frag == null) {
 				frag = Fragment.instantiate(act, fragClass.getName());
@@ -97,15 +97,15 @@ public class TabActivity extends FragmentActivity {
 		}
 
 		@Override
-		public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) {}
+		public void onTabReselected(Tab tab, FragmentTransaction ft) {}
 
 		@Override
-		public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) {
+		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 
-			frag = act.getSupportFragmentManager().findFragmentByTag(tag);
+			frag = act.getFragmentManager().findFragmentByTag(tag);
 			
 			if (frag != null && !frag.isDetached()) {
-				act.getSupportFragmentManager()
+				act.getFragmentManager()
 				.beginTransaction()
 				.detach(frag)
 				.commit();
