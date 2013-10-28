@@ -7,43 +7,35 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.off.on.R;
 
 public class ResultArrayAdapter<T> extends ArrayAdapter<T> {
-        private int mListItemLayoutResId;
+        private int listItemResId;
 
         public ResultArrayAdapter(Context context, T[] ts) {
-        	super(context, android.R.layout.two_line_list_item, ts);
-        	mListItemLayoutResId = android.R.layout.two_line_list_item;
+        	super(context, R.layout.fragment_list_item, ts);
+        	listItemResId = R.layout.fragment_list_item;
         }
 
         @Override
-        public android.view.View getView(
-                int position, 
-                View convertView,
-                ViewGroup parent) {
+        public View getView(int position, View convertView, ViewGroup parent) {
 
-
-            LayoutInflater inflater = (LayoutInflater)getContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             View listItemView = convertView;
             if (null == convertView) { 
-                listItemView = inflater.inflate(
-                    mListItemLayoutResId, 
-                    parent, 
-                    false);
+                listItemView = inflater.inflate(listItemResId, parent, false);
             }
 
-            // The ListItemLayout must use the standard text item IDs.
             TextView lineOneView = (TextView)listItemView.findViewById(
-                android.R.id.text1);
+                R.id.textViewMain);
             
             TextView lineTwoView = (TextView)listItemView.findViewById(
-                android.R.id.text2);
+                R.id.textViewSub);
 
             T t = (T)getItem(position); 
-            lineOneView.setText("Test1");
-            lineTwoView.setText("Test2");
+            lineOneView.setText("Testing Text - The Title of the item");
+            lineTwoView.setText("Testing Text - Added with information, might fill up several lines.");
 
             return listItemView;
         }
