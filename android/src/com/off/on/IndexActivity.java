@@ -41,21 +41,14 @@ public class IndexActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(getApplicationContext(), "Refreshed",
-						Toast.LENGTH_SHORT).show();
-
-				getCurrentState(true, true);
+				/*Toast.makeText(getApplicationContext(), "Refreshed",
+						Toast.LENGTH_SHORT).show();*/
 			}
 		});
 	}
 
 	@Override
 	protected void onStart() {
-		onStateReceiver = new MyReceiver();
-		IntentFilter intentLocationFilter = new IntentFilter();
-		intentLocationFilter.addAction(Constants.LocationActionTag);
-		intentLocationFilter.addAction(Constants.OrientationActionTag);
-		registerReceiver(onStateReceiver, intentLocationFilter);
 		super.onStart();
 	}
 
@@ -73,6 +66,11 @@ public class IndexActivity extends Activity {
 	@Override
 	protected void onResume() {
 		getCurrentState(true, true);
+		onStateReceiver = new MyReceiver();
+		IntentFilter intentLocationFilter = new IntentFilter();
+		intentLocationFilter.addAction(Constants.LocationActionTag);
+		intentLocationFilter.addAction(Constants.OrientationActionTag);
+		registerReceiver(onStateReceiver, intentLocationFilter);
 		super.onResume();
 	}
 
@@ -116,6 +114,7 @@ public class IndexActivity extends Activity {
 								altitude, accuracy, gpsProvider,
 								networkProvider, azimuth, pitch, roll))
 						.execute(Constants.WebServerURL);
+				unregisterReceiver(onStateReceiver);
 			}
 
 			mainText.setText("Latitude: " + String.valueOf(latitude)
