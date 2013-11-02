@@ -76,7 +76,12 @@ public class LocationService extends Service {
 
 	@Override
 	public void onStart(Intent intent, int startId) {
-		sendGPSIntent();
+		if (isGpsProvider() || isNetworkProvider()) {
+			if (getAccuracy() != -1 && getAltitude() != -1
+					&& getLatitude() != -1 && getLongitude() != -1) {
+				sendGPSIntent();
+			}
+		}
 	}
 
 	@Override
@@ -92,7 +97,8 @@ public class LocationService extends Service {
 		onGPSIntent.putExtra(Constants.LocationFlagAltitude, getAltitude());
 		onGPSIntent.putExtra(Constants.LocationFlagAccuracy, getAccuracy());
 		onGPSIntent.putExtra(Constants.LocationGPSProvider, isGpsProvider());
-		onGPSIntent.putExtra(Constants.LocationNetworkProvider, isNetworkProvider());
+		onGPSIntent.putExtra(Constants.LocationNetworkProvider,
+				isNetworkProvider());
 		sendBroadcast(onGPSIntent);
 	}
 

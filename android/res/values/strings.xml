@@ -4,5 +4,9 @@
     <string name="app_name">ON</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="tab_map_name">Map</string>
+    <string name="tab_list_name">List</string>
+    <string name="list_empty_notification">No data found for this location.</string>
+    <string name="loading">wait I\'m on it</string>
 
 </resources>

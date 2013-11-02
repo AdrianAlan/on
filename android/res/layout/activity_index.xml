@@ -1,38 +1,46 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#cccccc"
+    android:padding="40dp"
+    android:orientation="vertical"
     tools:context=".IndexActivity" >
+	
+		<RelativeLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+		    android:padding="40dp"
+    		android:background="@drawable/roundedcorners">
+		    <TextView
+		        android:id="@+id/mainText"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/buttonRefresh"
+		        android:gravity="left"
+		        android:keepScreenOn="true"
+		        android:text="@string/dummy_content"
+		        android:textColor="#33b5e5"
+		        android:textSize="30sp"
+		        android:textStyle="bold" />
+		
+		    <Button
+		        android:id="@+id/buttonRefresh"
+		        style="?android:attr/buttonStyleSmall"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentLeft="true"
+		        android:text="Refresh" />
+		
+		    <Button
+		        android:id="@+id/buttonMap"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentBottom="true"
+		        android:layout_centerHorizontal="true"
+		        android:layout_marginBottom="69dp"
+		        android:onClick="testMap"
+		        android:text="Map Time" />
+	
+		</RelativeLayout>
 
-    <TextView
-        android:id="@+id/mainText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/buttonRefresh"
-        android:gravity="left"
-        android:keepScreenOn="true"
-        android:text="@string/dummy_content"
-        android:textColor="#33b5e5"
-        android:textSize="30sp"
-        android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/buttonRefresh"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:text="Refresh" />
-
-    <Button
-        android:id="@+id/buttonMap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="69dp"
-        android:onClick="testMap"
-        android:text="Map Time" />
-
-</RelativeLayout>
+</LinearLayout>

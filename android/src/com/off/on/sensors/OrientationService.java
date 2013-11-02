@@ -21,13 +21,13 @@ public class OrientationService extends Service implements SensorEventListener {
 	private Sensor sensorAccelerometer, sensorMagneticField;
 	private float[] valuesAccelerometer, valuesMagneticField;
 	private float[] matrixR, matrixI, matrixValues;
-	private double azimuthON = 0, pitchON = 0, rollON = 0;
+	private double azimuthON = -1, pitchON = -1, rollON = -1;
 
 	@Override
 	public void onCreate() {
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
-		//we use two types of sensors to ensure accuracy
+		// we use two types of sensors to ensure accuracy
 		sensorAccelerometer = sensorManager
 				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		sensorMagneticField = sensorManager
@@ -49,15 +49,19 @@ public class OrientationService extends Service implements SensorEventListener {
 
 	@Override
 	public void onStart(Intent intent, int startId) {
-		sendOrientationIntent();
+		if (getAzimuth() != -1 && getPitch() != -1 && getRoll() != -1) {
+			sendOrientationIntent();
+		}
 	}
 
 	private void sendOrientationIntent() {
 		Intent onOrientationIntent = new Intent();
 		onOrientationIntent.setAction(Constants.OrientationActionTag);
-		onOrientationIntent.putExtra(Constants.OrientationFlagAzimuth, getAzimuth());
+		onOrientationIntent.putExtra(Constants.OrientationFlagAzimuth,
+				getAzimuth());
 		onOrientationIntent.putExtra(Constants.OrientationFlagRoll, getRoll());
-		onOrientationIntent.putExtra(Constants.OrientationFlagPitch, getPitch());
+		onOrientationIntent
+				.putExtra(Constants.OrientationFlagPitch, getPitch());
 		sendBroadcast(onOrientationIntent);
 	}
 
@@ -90,8 +94,8 @@ public class OrientationService extends Service implements SensorEventListener {
 				setRoll(Math.toDegrees(matrixValues[2]));
 			}
 		} catch (Exception e) {
-			Log.e("onOrientationManager", "Failed to request orientation update"
-					+ e);
+			Log.e("onOrientationManager",
+					"Failed to request orientation update" + e);
 		}
 	}
 
