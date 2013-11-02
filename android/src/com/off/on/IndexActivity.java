@@ -14,12 +14,12 @@ import android.view.Window;
 import android.widget.Toast;
 
 import com.off.on.communication.WebSpeaker;
+import com.off.on.models.Objects;
 import com.off.on.sensors.LocationService;
 import com.off.on.sensors.OrientationService;
 import com.off.on.utils.Constants;
 import com.off.on.utils.JSONParser;
 import com.off.on.utils.Utils;
-import com.on.off.models.Objects;
 
 public class IndexActivity extends Activity {
 
