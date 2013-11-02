@@ -16,4 +16,15 @@ public class Constants {
 	public static final String OrientationFlagAzimuth = "onAzimuth";
 	public static final String OrientationFlagRoll = "onRoll";
 	public static final String OrientationFlagPitch = "onPitch";
+	
+	public static final String WebServerURL = "http://54.225.24.113/cgi-bin/lookup";
+	public static final String WebServerLatitudeTag = "latitude";
+	public static final String WebServerLongitudeTag = "longitude";
+	public static final String WebServerAltitudeTag = "altitude";
+	public static final String WebServerAccuracyTag = "accuracy";
+	public static final String WebServerGPSProviderTag = "gps";
+	public static final String WebServerNetworkProviderTag = "network";
+	public static final String WebServerAzimuthTag = "azimuth";
+	public static final String WebServerRollTag = "roll";
+	public static final String WebServerPitchTag = "pitch";
 }

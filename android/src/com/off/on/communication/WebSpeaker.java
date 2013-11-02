@@ -2,7 +2,6 @@ package com.off.on.communication;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -13,7 +12,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import android.content.Context;
@@ -30,9 +28,11 @@ public class WebSpeaker extends AsyncTask<String, Void, String> {
     private String onResponseJSON =  null;
     private boolean returnError = false;
     private Context onContext;
+    private List<NameValuePair> onComRequest;
  
-    public WebSpeaker(Context context){
+    public WebSpeaker(Context context, List<NameValuePair> request){
         this.onContext = context;
+        this.onComRequest = request;
     }
  
     protected void onPreExecute() {
@@ -42,22 +42,15 @@ public class WebSpeaker extends AsyncTask<String, Void, String> {
     //Magic happens here
     protected String doInBackground(String... s) {
  
-        String URL = null;
-        String nameparamr = "started";
-        String paramvalue = "from-the-bottom";
- 
+        String URL = s[0];
+        
         try {
-            URL = s[0];
             HttpConnectionParams.setConnectionTimeout(onPassParams, REGISTRATION_TIMEOUT * 1000);
             HttpConnectionParams.setSoTimeout(onPassParams, WAIT_TIMEOUT * 1000);
             ConnManagerParams.setTimeout(onPassParams, WAIT_TIMEOUT * 1000);
  
             HttpPost httpPost = new HttpPost(URL);
- 
-            //Setting parameters
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-            nameValuePairs.add(new BasicNameValuePair(nameparamr,paramvalue));
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            httpPost.setEntity(new UrlEncodedFormEntity(onComRequest));
  
             //Main thing
             onServerResponse = onHTTPClient.execute(httpPost);
