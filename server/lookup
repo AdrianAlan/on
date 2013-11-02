@@ -14,7 +14,7 @@ my $q = CGI->new();
 
 print $q->header();
 
-my $offset = 30;
+my $offset = 15;
 my $d = 100;
 my $R = 6731000; # earth radius in meters
 
@@ -23,14 +23,10 @@ my $lon = toDecimal($q->param('longitude'));
 my $theta = $q->param('azimuth');
 my $accuracy = $q->param('accuracy');
 
-print "input: $lat - $lon - $theta <br>";
-
 # Find the 0 point 
 my $theta0 = $theta + 180;
 my $lat0 = calLatitude ($lat, $lon, $theta0, $accuracy, $R);
 my $lon0 = calLongtitude ($lat, $lon, $theta0, $accuracy, $R);
-
-print "0 point: $lat0 - $lon0 - $theta0 <br>";
 
 #print calDistance("50.847222", "50.847222", "50.8475", "50.847222 <br>");
 # Create the 2 point that can create the border */
@@ -38,13 +34,11 @@ my $theta1 = $theta - $offset;
 my $lat1 = calLatitude ($lat0, $lon0, $theta1, $d, $R);
 my $lon1 = calLongtitude ($lat0, $lon0, $theta1, $d, $R);
 
-print "First point: $lat1 - $lon1 - $theta1 <br>";
+
 
 my $theta2 = $theta + $offset;
 my $lat2 = calLatitude ($lat0, $lon0, $theta2, $d, $R);
 my $lon2 = calLongtitude ($lat0, $lon0, $theta2, $d, $R);
-
-print "Second point: $lat2 - $lon2 - $theta2 <br>";
 
 
 # Query the database for coordinate in range
@@ -53,7 +47,7 @@ my ($maxLat, $minLat, $maxLon, $minLon) = findBorderValue({
 		'lon' => [ $lon0, $lon1, $lon2 ]
 	});
 
-print "Border value: $minLat - $maxLat - $minLon - $maxLon <br>";
+
 
 # Convert point 1 and 2 to x, y coordinates, distance is d
 my ($x1, $y1) = convertCoordinate({
@@ -66,16 +60,14 @@ my ($x2, $y2) = convertCoordinate({
 		'angle' => $theta2
 	});
 
-print "Triangle point: $x1 - $y1, $x2 - $y2 <br>";
-
 my $db = DBI->connect('dbi:mysql:cs4274','root','cs2107') or die "cant connect to db";
 my $sql = "select * from places where longitude between ? and ? and latitude between ? and ?";
 my $sth = $db->prepare($sql);
 $sth->execute($minLon, $maxLon, $minLat, $maxLat);
 
-
 # Determine if the retrieve value is inside the view area
 my $result;
+my $count = 0;
 while (my $row = $sth->fetchrow_hashref) {
 	my $lat3 = $row->{'latitude'};
 	my $lon3 = $row->{'longitude'};
@@ -86,10 +78,39 @@ while (my $row = $sth->fetchrow_hashref) {
 			'angle' => $bearing
 		});	
 	if (isInsideTri($x1, $y1, $x2, $y2, $x3, $y3)){
-		$result->{$row->{'id'}} = $row;
+		push @{$result->{"objects"}}, $row;
+		$count++;
 	}
 }
-print Dumper $result;
+
+$result->{"type"} = "RESPONSE";
+$result->{"count"} = $count;
+
+$result->{"firstPoint"} = {
+	"latitude" => $lat1,
+	"longitude" => $lon1,
+	"bearing" => $theta1
+};
+
+$result->{"secondPoint"} = {
+	"latitude" => $lat2,
+	"longitude" => $lon2,
+	"bearing" => $theta2
+};
+
+$result->{"myLocation"} = {
+	"latitude" => $lat,
+	"longitude" => $lon,
+	"bearing" => $theta
+};
+
+# print "input: $lat - $lon - $theta <br>";
+# print "0 point: $lat0 - $lon0 - $theta0 <br>";
+# print "First point: $lat1 - $lon1 - $theta1 <br>";
+# print "Second point: $lat2 - $lon2 - $theta2 <br>";
+# print "Border value: $minLat - $maxLat - $minLon - $maxLon <br>";
+# print "Triangle point: $x1 - $y1, $x2 - $y2 <br>";
+print to_json $result;
 
 sub calLatitude {
 	my ($lat1, $lon1, $theta, $d, $R) = @_;
