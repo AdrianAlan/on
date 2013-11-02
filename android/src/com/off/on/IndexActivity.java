@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,8 +33,9 @@ public class IndexActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_index);
-
+		
 		ONorOFF = (Button) findViewById(R.id.buttonRefresh);
 		mainText = (TextView) findViewById(R.id.mainText);
 
@@ -49,6 +51,11 @@ public class IndexActivity extends Activity {
 
 	@Override
 	protected void onStart() {
+		onStateReceiver = new MyReceiver();
+		IntentFilter intentLocationFilter = new IntentFilter();
+		intentLocationFilter.addAction(Constants.LocationActionTag);
+		intentLocationFilter.addAction(Constants.OrientationActionTag);
+		registerReceiver(onStateReceiver, intentLocationFilter);
 		super.onStart();
 	}
 
