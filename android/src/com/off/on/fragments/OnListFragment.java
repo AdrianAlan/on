@@ -22,7 +22,8 @@ public class OnListFragment extends ListFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		// Send back to map tab and highlight selection or exand for more information.
+		getActivity().getActionBar().setSelectedNavigationItem(0);
+		// Send id to map.
 	}
 	
 	

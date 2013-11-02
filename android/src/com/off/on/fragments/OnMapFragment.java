@@ -11,9 +11,11 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
@@ -41,6 +43,14 @@ public class OnMapFragment extends MapFragment {
 			addMarkers();
 			drawPolygon();
 			moveCamera();
+            map.setOnInfoWindowClickListener(new OnInfoWindowClickListener()
+            {
+				@Override
+				public void onInfoWindowClick(Marker arg0) {
+                    getActivity().getActionBar().setSelectedNavigationItem(1);
+                    // Pass information on which marker was clicked.
+				}
+            });  
 		}
 	}
 
@@ -70,8 +80,10 @@ public class OnMapFragment extends MapFragment {
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 	}
 
-
+	
 	private List<LatLng> createTriangle(LatLng viewpoint, LatLng frontLeft, LatLng frontRight) {
 		return Arrays.asList(viewpoint, frontLeft, frontRight);
 	}
+	
+	
 }
