@@ -34,11 +34,4 @@
     </style>
 
     <style name="ButtonBarButton" />
-
-	<style name="TabDarkTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-	      <item name="@android:attr/actionBarTabTextStyle">@style/TabDarkText</item>
-	</style>
-	<style name="TabDarkText" parent="android:Widget.Holo.Light.ActionBar.TabText.Inverse">
-	      <item name="android:textColor">#FFFFFF</item>
-	</style>
 </resources>

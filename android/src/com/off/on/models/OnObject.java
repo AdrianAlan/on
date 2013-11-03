@@ -1,43 +1,40 @@
-package model;
+package com.off.on.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Result implements Parcelable {
+public class OnObject implements Parcelable {
 
 	private int id;
-	private String info;
-	private String name;
-	private String clz;
-	private double longitude;
-	private double latitude;
-	private double altitude;
+	private String info, name, category;
+	private double longitude, latitude, altitude;
 
-	public static final Parcelable.Creator<Result> CREATOR = new Parcelable.Creator<Result>() {
-		public Result createFromParcel(Parcel in) {
-			return new Result(in);
+	public static final Parcelable.Creator<OnObject> CREATOR = new Parcelable.Creator<OnObject>() {
+		public OnObject createFromParcel(Parcel in) {
+			return new OnObject(in);
 		}
 
-		public Result[] newArray(int size) {
-			return new Result[size];
+		public OnObject[] newArray(int size) {
+			return new OnObject[size];
 		}
 	};
-	
-	public Result(int id, String info, String name, String clz, double longitude, double latitude, double altitude) {
+
+	public OnObject(int id, String info, String name, String category,
+			double longitude, double latitude, double altitude) {
 		this.id = id;
 		this.info = info;
 		this.name = name;
-		this.clz = clz;
+		this.category = category;
 		this.longitude = longitude;
 		this.latitude = latitude;
 		this.altitude = altitude;
 	}
 
-	public Result(Parcel in) {
+	public OnObject(Parcel in) {
 		id = in.readInt();
 		info = in.readString();
 		name = in.readString();
-		clz = in.readString();
+		category = in.readString();
 		longitude = in.readDouble();
 		latitude = in.readDouble();
 		altitude = in.readDouble();
@@ -53,7 +50,7 @@ public class Result implements Parcelable {
 		dest.writeInt(id);
 		dest.writeString(info);
 		dest.writeString(name);
-		dest.writeString(clz);
+		dest.writeString(category);
 		dest.writeDouble(longitude);
 		dest.writeDouble(latitude);
 		dest.writeDouble(altitude);
@@ -71,8 +68,8 @@ public class Result implements Parcelable {
 		return name;
 	}
 
-	public String getClz() {
-		return clz;
+	public String getCategory() {
+		return category;
 	}
 
 	public double getLongitude() {
@@ -87,4 +84,3 @@ public class Result implements Parcelable {
 		return altitude;
 	}
 }
-

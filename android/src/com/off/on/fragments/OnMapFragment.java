@@ -1,6 +1,8 @@
 package com.off.on.fragments;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import android.graphics.Color;
@@ -12,27 +14,32 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.off.on.TabActivity;
+import com.off.on.models.OnObject;
+import com.off.on.models.Triangle;
+import com.off.on.utils.Constants;
 
-public class OnMapFragment extends MapFragment {
+public class OnMapFragment extends SupportMapFragment {
 
 	private GoogleMap map;
 	private static View view;
-	
-	// Testing purposes
-	private final static LatLng SOC = new LatLng(1.295441, 103.773497);
-	private final static LatLng SOCFrontLeft = new LatLng(1.295441 - 0.00025, 103.773497 + 0.0005);
-	private final static LatLng SOCFrontRight = new LatLng(1.295441 + 0.00025, 103.773497 + 0.0005);
 
+	private Triangle onTriangle;
+	private ArrayList<OnObject> onObjects;
+	private HashMap<String, Integer> markerMap;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
 		view = super.onCreateView(inflater, container, savedInstanceState);
+		onTriangle = getArguments().getParcelable(Constants.onNewActivityTriangle);
+		onObjects = getArguments().getParcelableArrayList(Constants.onNewActivityDetails);
 		setUpMap();
 		return view;
 	}
@@ -43,47 +50,53 @@ public class OnMapFragment extends MapFragment {
 			addMarkers();
 			drawPolygon();
 			moveCamera();
-            map.setOnInfoWindowClickListener(new OnInfoWindowClickListener()
-            {
+			map.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 				@Override
-				public void onInfoWindowClick(Marker arg0) {
-                    getActivity().getActionBar().setSelectedNavigationItem(1);
-                    // Pass information on which marker was clicked.
+				public void onInfoWindowClick(Marker marker) {
+					int objectsId = markerMap.get(marker.getId());
+					for (OnObject onObject : onObjects) {
+						if (objectsId == onObject.getId()) {
+							((TabActivity) getActivity()).requestDetailedView(onObject);
+							break;
+						}
+					}
 				}
-            });  
+			});
 		}
 	}
 
 	private void addMarkers() {
-		map.addMarker(new MarkerOptions()
-		.position(new LatLng(SOC.latitude, SOC.longitude + 0.00025))
-		.title("School of Computing")
-		.snippet("Snippet about the location."));
+		markerMap = new HashMap<String, Integer>();
+		MarkerOptions marker;
+		for (OnObject onObject : onObjects) {
+			marker = new MarkerOptions()
+					.position(new LatLng(onObject.getLatitude(), onObject.getLongitude()))
+					.title(onObject.getName())
+					.snippet(onObject.getCategory() + ": " + onObject.getInfo());
+			markerMap.put(map.addMarker(marker).getId(), onObject.getId());
+		}
 	}
 
 	private void drawPolygon() {
-		// Add triangular polygon
-		map.addPolygon(new PolygonOptions()
-		.addAll(createTriangle(SOC, SOCFrontLeft, SOCFrontRight))
-		.fillColor(Color.argb(64, 255, 0, 0))
-		.strokeColor(Color.BLACK)
-		.strokeWidth(1));	
+		map.addPolygon(new PolygonOptions().addAll(createTriangle())
+				.fillColor(Color.argb(64, 255, 0, 0)).strokeColor(Color.BLACK)
+				.strokeWidth(1));
 	}
 
 	private void moveCamera() {
 		CameraPosition cameraPosition = new CameraPosition.Builder()
-		.target(SOC)
-		.zoom(19)
-		.bearing(90)
-		.tilt(30)
-		.build();
+				.target(new LatLng(onTriangle.getLatitude(), onTriangle.getLongitude()))
+				.zoom(19)
+				.bearing((float) onTriangle.getBearing() - 180) // TODO: Temporary fix to inverted bearing.
+				.tilt(30).build();
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 	}
 
-	
-	private List<LatLng> createTriangle(LatLng viewpoint, LatLng frontLeft, LatLng frontRight) {
-		return Arrays.asList(viewpoint, frontLeft, frontRight);
+	private List<LatLng> createTriangle() {
+		return Arrays.asList(
+					new LatLng(onTriangle.getLatitude(), onTriangle.getLongitude()),
+					new LatLng(onTriangle.getPointOneLat(), onTriangle.getPointOneLong()),
+					new LatLng(onTriangle.getPointTwoLat(), onTriangle.getPointTwoLong())
+				);
 	}
-	
-	
 }

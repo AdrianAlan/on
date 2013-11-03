@@ -14,7 +14,8 @@ import android.view.Window;
 import android.widget.Toast;
 
 import com.off.on.communication.WebSpeaker;
-import com.off.on.models.Objects;
+import com.off.on.models.OnObject;
+import com.off.on.models.Triangle;
 import com.off.on.sensors.LocationService;
 import com.off.on.sensors.OrientationService;
 import com.off.on.utils.Constants;
@@ -208,11 +209,11 @@ public class IndexActivity extends Activity {
 		}
 	};
 
-	private void startMap(ArrayList<ArrayList<Double>> onTrianglePoints,
-			ArrayList<Objects> onDetailsPushed) {
+	private void startMap(Triangle onTriangle,
+			ArrayList<OnObject> onDetailsPushed) {
 		Intent startNewActivityIntent = new Intent(this, TabActivity.class);
-		startNewActivityIntent.putExtra(Constants.onNewActivityTriangle,
-				onTrianglePoints);
+		startNewActivityIntent.putExtra(Constants.onNewActivityTriangle, 
+				onTriangle);
 		startNewActivityIntent.putExtra(Constants.onNewActivityDetails,
 				onDetailsPushed);
 		startActivity(startNewActivityIntent);

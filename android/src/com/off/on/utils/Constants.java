@@ -58,7 +58,12 @@ public class Constants {
 	public static final String JSONObjectLatitude = "latitude";
 	public static final String JSONObjectAltitude = "altitude";
 
+	public static final String TAG_MAP = "map";
+	public static final String TAG_LIST = "list";
+	public static final String STATE_CURRENT_TAB = "state_current_tab";
+	
 	public static String onNewActivityTriangle = "onActivityTriangleTag";
 	public static String onNewActivityDetails = "onActivityDetailsTag";
+	public static String onNewActivityOnObject = "onActivityOnObjectTag";
 
 }

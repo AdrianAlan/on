@@ -6,7 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.off.on.models.Objects;
+import com.off.on.models.OnObject;
+import com.off.on.models.Triangle;
 
 import android.util.Log;
 
@@ -43,37 +44,41 @@ public class JSONParser {
 		return 0;
 	}
 
-	public ArrayList<ArrayList<Double>> readTriangle() {
-		ArrayList<ArrayList<Double>> onTriangleReturn = new ArrayList<ArrayList<Double>>();
-		JSONObject jTempObject;
-		ArrayList<Double> onTrianglePoint;
+	public Triangle readTriangle() {
+		
+		Triangle onTriangle = null;
 		try {
-			onTrianglePoint = new ArrayList<Double>();
-			jTempObject = jObject.getJSONObject(Constants.JSONPointZero);
-			onTrianglePoint.add(jTempObject.getDouble(Constants.JSONLongitude));
-			onTrianglePoint.add(jTempObject.getDouble(Constants.JSONLatitude));
-			onTrianglePoint.add(jTempObject.getDouble(Constants.JSONBearing));
-			onTriangleReturn.add(onTrianglePoint);
-			onTrianglePoint = new ArrayList<Double>();
+			
+			JSONObject jTempObject = jObject.getJSONObject(Constants.JSONPointZero);
+			Double latitude = jTempObject
+					.getDouble(Constants.JSONLatitude);
+			Double longitude = jTempObject
+					.getDouble(Constants.JSONLongitude);
+			Double bearing = jTempObject
+					.getDouble(Constants.JSONBearing);
+
 			jTempObject = jObject.getJSONObject(Constants.JSONPointOne);
-			onTrianglePoint.add(jTempObject.getDouble(Constants.JSONLongitude));
-			onTrianglePoint.add(jTempObject.getDouble(Constants.JSONLatitude));
-			onTrianglePoint.add(jTempObject.getDouble(Constants.JSONBearing));
-			onTriangleReturn.add(onTrianglePoint);
-			onTrianglePoint = new ArrayList<Double>();
+			Double pointOneLat = jTempObject
+					.getDouble(Constants.JSONLatitude);
+			Double pointOneLong = jTempObject
+					.getDouble(Constants.JSONLongitude);
+			
 			jTempObject = jObject.getJSONObject(Constants.JSONPointTwo);
-			onTrianglePoint.add(jTempObject.getDouble(Constants.JSONLongitude));
-			onTrianglePoint.add(jTempObject.getDouble(Constants.JSONLatitude));
-			onTrianglePoint.add(jTempObject.getDouble(Constants.JSONBearing));
-			onTriangleReturn.add(onTrianglePoint);
+			Double pointTwoLat = jTempObject
+					.getDouble(Constants.JSONLatitude);
+			Double pointTwoLong = jTempObject
+					.getDouble(Constants.JSONLongitude);
+
+			onTriangle = new Triangle(latitude, longitude, bearing, pointOneLat, pointOneLong, pointTwoLat, pointTwoLong);
+			
 		} catch (JSONException e) {
 			Log.e(Constants.Error, "Error parsing data " + e.toString());
 		}
-		return onTriangleReturn;
+		return onTriangle;
 	}
 
-	public ArrayList<Objects> readObjects() {
-		ArrayList<Objects> onObjects = new ArrayList<Objects>();
+	public ArrayList<OnObject> readObjects() {
+		ArrayList<OnObject> onObjects = new ArrayList<OnObject>();
 		try {
 			JSONArray JSONObjects = jObject.getJSONArray(Constants.JSONObjects);
 			for (int i = 0; i < JSONObjects.length(); i++) {
@@ -90,7 +95,7 @@ public class JSONParser {
 				Double altitude = onObject
 						.getDouble(Constants.JSONObjectAltitude);
 
-				onObjects.add(new Objects(id, info, name, category, longitude,
+				onObjects.add(new OnObject(id, info, name, category, longitude,
 						latitude, altitude));
 			}
 		} catch (JSONException e) {

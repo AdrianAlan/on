@@ -50,8 +50,11 @@
         <activity
             android:name="com.off.on.TabActivity"
             android:theme="@android:style/Theme.Translucent">
-            <!-- android:theme="@style/TabDarkTheme" -->
-            
+        </activity>
+        
+        <activity
+            android:name="com.off.on.DetailActivity"
+            android:theme="@android:style/Theme.Translucent">
         </activity>
         
         <service android:name="com.off.on.sensors.LocationService" />

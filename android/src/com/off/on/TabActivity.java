@@ -1,115 +1,63 @@
 package com.off.on;
 
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTabHost;
+import android.view.View;
 import android.view.Window;
+import android.widget.TabWidget;
 
 import com.off.on.fragments.OnListFragment;
 import com.off.on.fragments.OnMapFragment;
+import com.off.on.models.OnObject;
+import com.off.on.utils.Constants;
 
-public class TabActivity extends Activity {
+public class TabActivity extends FragmentActivity {
 
-	private static final String TAG_MAP = "map";
-	private static final String TAG_LIST = "list";
-	private static final String STATE_CURRENT_TAB = "state_current_tab";
-	private ActionBar bar;
+    private FragmentTabHost mTabHost;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-
-		setContentView(R.layout.activity_tab);
-
-		bar = getActionBar();
-		bar.setDisplayShowTitleEnabled(false);
-		bar.setDisplayShowHomeEnabled(false);
-		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-		Tab mapTab = bar.newTab()
-				.setText(R.string.tab_map_name)
-				.setTag(TAG_MAP)
-				.setTabListener(new TabListener<OnMapFragment>(this, TAG_MAP, OnMapFragment.class));
-		Tab listTab = bar.newTab()
-				.setText(R.string.tab_list_name)
-				.setTag(TAG_LIST)
-				.setTabListener(new TabListener<OnListFragment>(this, TAG_LIST, OnListFragment.class));
-
-		bar.addTab(mapTab);
-		bar.addTab(listTab);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.fragmentactivity_tabs);
+        TabWidget widget = (TabWidget)findViewById(android.R.id.tabs);
+        widget.setStripEnabled(false);
+        mTabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
+        mTabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
+        
+        mTabHost.addTab(mTabHost.newTabSpec(Constants.TAG_MAP).setIndicator(getString(R.string.tab_map_name)),
+                OnMapFragment.class, getIntent().getExtras());
+        mTabHost.addTab(mTabHost.newTabSpec(Constants.TAG_LIST).setIndicator(getString(R.string.tab_list_name)),
+                OnListFragment.class, getIntent().getExtras());
 
 		if (savedInstanceState != null) {
-			if (savedInstanceState.getString(STATE_CURRENT_TAB) == mapTab.getTag()) {
-				bar.selectTab(mapTab);
-			} else if (savedInstanceState.getString(STATE_CURRENT_TAB) == listTab.getTag()) {
-				bar.selectTab(listTab);            
-			}
-		} 
+			mTabHost.setCurrentTabByTag(savedInstanceState.getString(Constants.STATE_CURRENT_TAB));
+		}
 	}
-
+	
+	public void requestDetailedView(OnObject onObject) {
+		Intent intent = new Intent(this, DetailActivity.class);
+		intent.putExtra(Constants.onNewActivityOnObject, onObject);
+		startActivity(intent);
+	}
+	
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putString(STATE_CURRENT_TAB, (String) bar.getSelectedTab().getTag());
+		outState.putString(Constants.STATE_CURRENT_TAB, (String) mTabHost.getCurrentTabTag());
 	}
-
-	public static class TabListener<T extends Fragment> implements ActionBar.TabListener {
-
-		private Fragment frag;
-		private final Activity act;
-		private final String tag;
-		private final Class<T> fragClass;
-		private FragmentTransaction fragTrans;
-
-		public TabListener(Activity activity, String tag, Class<T> clz) {
-
-			this.act = activity;
-			this.tag = tag;
-			this.fragClass = clz;
-
-			frag = act.getFragmentManager().findFragmentByTag(tag);
-			
-			if (frag != null && !frag.isDetached()) {
-				act.getFragmentManager().beginTransaction()
-				.detach(frag)
-				.commit();
-			}
-		}
-
-		@Override
-		public void onTabSelected(Tab tab, FragmentTransaction ft) {
-
-			frag = act.getFragmentManager().findFragmentByTag(tag);
-			fragTrans = act.getFragmentManager().beginTransaction();
-
-			if (frag == null) {
-				frag = Fragment.instantiate(act, fragClass.getName());
-				fragTrans.replace(R.id.fragment_container, frag)
-				.commit();
-			} else {
-				fragTrans.attach(frag)
-				.commit();
-			}
-		}
-
-		@Override
-		public void onTabReselected(Tab tab, FragmentTransaction ft) {}
-
-		@Override
-		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-
-			frag = act.getFragmentManager().findFragmentByTag(tag);
-			
-			if (frag != null && !frag.isDetached()) {
-				act.getFragmentManager()
-				.beginTransaction()
-				.detach(frag)
-				.commit();
-			}
-		}
+		
+	@Override
+	protected void onPause() {
+		super.onPause();
+		(findViewById(R.id.tabMainView)).setVisibility(View.INVISIBLE);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		(findViewById(R.id.tabMainView)).setVisibility(View.VISIBLE);
 	}
 }
