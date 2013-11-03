@@ -87,7 +87,7 @@ public class OnMapFragment extends SupportMapFragment {
 		CameraPosition cameraPosition = new CameraPosition.Builder()
 				.target(new LatLng(onTriangle.getLatitude(), onTriangle.getLongitude()))
 				.zoom(19)
-				.bearing((float) onTriangle.getBearing() - 180) // TODO: Temporary fix to inverted bearing.
+				.bearing((float) onTriangle.getBearing()) // TODO: Temporary fix to inverted bearing.
 				.tilt(30).build();
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 	}

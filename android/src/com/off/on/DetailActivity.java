@@ -13,12 +13,14 @@ public class DetailActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		OnObject onObject = getIntent().getExtras().getParcelable(
 				Constants.onNewActivityOnObject);
 		setContentView(R.layout.activity_detail);
+		TextView detailedTitleTextView = (TextView) findViewById(R.id.detailTitleTextView);
 		TextView detailedTextView = (TextView) findViewById(R.id.detailTextView);
+		
+		detailedTitleTextView.setText(onObject.getName());
 		detailedTextView.setText(onObject.getInfo());
 	}
 }

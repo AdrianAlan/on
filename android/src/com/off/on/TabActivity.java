@@ -48,16 +48,4 @@ public class TabActivity extends FragmentActivity {
 		super.onSaveInstanceState(outState);
 		outState.putString(Constants.STATE_CURRENT_TAB, (String) mTabHost.getCurrentTabTag());
 	}
-		
-	@Override
-	protected void onPause() {
-		super.onPause();
-		(findViewById(R.id.tabMainView)).setVisibility(View.INVISIBLE);
-	}
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		(findViewById(R.id.tabMainView)).setVisibility(View.VISIBLE);
-	}
 }
