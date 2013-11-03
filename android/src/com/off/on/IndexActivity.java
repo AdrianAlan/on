@@ -120,18 +120,17 @@ public class IndexActivity extends Activity {
 
 			if (isOrientationReceived && isLocationReceived) {
 
-				Toast.makeText(
-						getApplicationContext(),
-						"Latitude: " + String.valueOf(onLatitude)
-								+ "; Longitude: " + String.valueOf(onLongitude)
-								+ "; Altitude: " + String.valueOf(onAltitude)
-								+ "; Accuracy: " + String.valueOf(onAccuracy)
-								+ "; GPS: " + gpsProvider + "; Network: "
-								+ networkProvider + "; Azimuth: "
-								+ String.valueOf(onAzimuth) + "; Roll "
-								+ String.valueOf(onRoll) + "; Pitch: "
-								+ onPitch, Toast.LENGTH_LONG).show();
-
+				/*
+				 * Toast.makeText( getApplicationContext(), "Latitude: " +
+				 * String.valueOf(onLatitude) + "; Longitude: " +
+				 * String.valueOf(onLongitude) + "; Altitude: " +
+				 * String.valueOf(onAltitude) + "; Accuracy: " +
+				 * String.valueOf(onAccuracy) + "; GPS: " + gpsProvider +
+				 * "; Network: " + networkProvider + "; Azimuth: " +
+				 * String.valueOf(onAzimuth) + "; Roll " +
+				 * String.valueOf(onRoll) + "; Pitch: " + onPitch,
+				 * Toast.LENGTH_LONG).show();
+				 */
 				if (uniqueBoolean) {
 					new WebSpeaker(getApplicationContext(),
 							Utils.nameValuePairsRequest(onLatitude,
@@ -212,7 +211,7 @@ public class IndexActivity extends Activity {
 	private void startMap(Triangle onTriangle,
 			ArrayList<OnObject> onDetailsPushed) {
 		Intent startNewActivityIntent = new Intent(this, TabActivity.class);
-		startNewActivityIntent.putExtra(Constants.onNewActivityTriangle, 
+		startNewActivityIntent.putExtra(Constants.onNewActivityTriangle,
 				onTriangle);
 		startNewActivityIntent.putExtra(Constants.onNewActivityDetails,
 				onDetailsPushed);
