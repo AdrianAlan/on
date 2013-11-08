@@ -34,11 +34,11 @@ public class Constants {
 	public static final String WebServerRollTag = "roll";
 	public static final String WebServerPitchTag = "pitch";
 
-	public static final String GPSisOFF = "gps is off... just sayin'";
-	public static final String InternetIsOFF = "no internet, no candies! need connection to proceed!";
-	public static final String UnableToON = "unable to ON it";
-	public static final String CommunicationError = "unable to ON it";
-	public static final String NoResults = "no resutls for your localization";
+	public static final String GPSisOFF = "GPS is off, turn it on and retry.";
+	public static final String InternetIsOFF = "No Internet connection available. Need a connection to proceed.";
+	public static final String UnableToON = "Unable to ON it.";
+	public static final String CommunicationError = "Unable to ON it.";
+	public static final String NoResults = "No results found for your location.";
 
 	public static final String JSONType = "type";
 	public static final String JSONResponse = "RESPONSE";

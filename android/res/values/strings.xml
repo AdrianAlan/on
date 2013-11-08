@@ -5,6 +5,6 @@
     <string name="tab_map_name">Map</string>
     <string name="tab_list_name">List</string>
     <string name="list_empty_notification">No data found for this location.</string>
-    <string name="loading">WAIT I\'M ON IT</string>
+    <string name="loading">Hold on, I\'m ON it!</string>
 
 </resources>

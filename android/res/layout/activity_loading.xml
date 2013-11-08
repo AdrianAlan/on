@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal|center_vertical"
     android:orientation="vertical"
-    tools:context=".IndexActivity" >
+    tools:context=".LoadActivity" >
 
     <ProgressBar
         android:id="@+id/progressBarLoading"

@@ -22,7 +22,7 @@ import com.off.on.utils.Constants;
 import com.off.on.utils.JSONParser;
 import com.off.on.utils.Utils;
 
-public class IndexActivity extends Activity {
+public class LoadActivity extends Activity {
 
 	private SensorsReceiver onStateReceiver;
 	private JSONReceiver onJSONReceiver;
