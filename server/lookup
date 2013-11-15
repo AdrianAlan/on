@@ -99,8 +99,8 @@ $result->{"secondPoint"} = {
 };
 
 $result->{"myLocation"} = {
-	"latitude" => $lat,
-	"longitude" => $lon,
+	"latitude" => $lat0,
+	"longitude" => $lon0,
 	"bearing" => $theta
 };
 
